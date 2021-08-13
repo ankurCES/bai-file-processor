@@ -14,7 +14,7 @@ root_path = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(root_path, 'README.rst')) as readme:
     README = readme.read()
 
-package_info = importlib.import_module('bai-file-processor')
+package_info = importlib.import_module('bai_file_processor')
 
 install_requires = []
 tests_require = [
@@ -22,13 +22,13 @@ tests_require = [
 ]
 
 setup(
-    name='bai-file-processor',
+    name='bai_file_processor',
     version=package_info.__version__,
     author=package_info.__author__,
     author_email='ankur.nair@cesltd.com',
     url='',
-    packages=['bai-file-processor'],
-    package_dir={'bai-file-processor': 'bai-file-processor'},
+    packages=['bai_file_processor'],
+    package_dir={'bai_file_processor': 'bai_file_processor'},
     include_package_data=True,
     license='MIT',
     description='BAI File Parser',
