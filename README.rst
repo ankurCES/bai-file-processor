@@ -23,7 +23,7 @@ Installation
 Usage
 -----
 
-To use bai2 in a project
+To use bai file processor in a project
 
 .. code-block:: python
 
