@@ -17,7 +17,7 @@ Installation
 
 .. code-block:: bash
 
-    pip install bai2
+    pip install bai-file-processor
 
 
 Usage
