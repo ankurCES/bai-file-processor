@@ -33,7 +33,7 @@ setup(
     license='MIT',
     description='BAI File Parser',
     long_description=README,
-    keywords='BAI File bookkeeping cash management balance reporting',
+    keywords='BAI bookkeeping cash management balance reporting',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',

@@ -1,7 +1,7 @@
 bai-file-processor
-====
+===================
 
-Python module for parsing and writing `BAI`_ files.
+Python module for parsing and writing Bai files.
 
 Built on top of BAI2 Python package with additional Export features added
 
@@ -56,10 +56,3 @@ Models structure::
         Bai2FileTrailer
 
 
-
-Original Library
----------
-
-_BAI2: http://www.bai.org/Libraries/Site-General-Downloads/Cash_Management_2005.sflb.ashx
-_GitHub: https://github.com/ministryofjustice/bai2
-_PyPi: https://pypi.org/project/bai2/
