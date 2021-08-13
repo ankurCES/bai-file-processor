@@ -60,6 +60,6 @@ Models structure::
 Original Library
 ---------
 
-.. _BAI2: http://www.bai.org/Libraries/Site-General-Downloads/Cash_Management_2005.sflb.ashx
-.. _GitHub: https://github.com/ministryofjustice/bai2
-.. _PyPi: https://pypi.org/project/bai2/
+_BAI2: http://www.bai.org/Libraries/Site-General-Downloads/Cash_Management_2005.sflb.ashx
+_GitHub: https://github.com/ministryofjustice/bai2
+_PyPi: https://pypi.org/project/bai2/
