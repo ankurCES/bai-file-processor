@@ -26,7 +26,7 @@ setup(
     version=package_info.__version__,
     author=package_info.__author__,
     author_email='ankur.nair@cesltd.com',
-    url='',
+    url='https://github.com/ankurCES/bai-file-processor',
     packages=['bai_file_processor'],
     package_dir={'bai_file_processor': 'bai_file_processor'},
     include_package_data=True,
