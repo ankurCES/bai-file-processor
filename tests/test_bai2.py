@@ -1,6 +1,7 @@
 import os
 import tempfile
 import warnings
+from decimal import Decimal
 from unittest import TestCase
 
 from bai_file_processor import bai_parser
@@ -113,6 +114,43 @@ class ParseTestCase(TestCase):
             self.assertTrue(os.path.exists(os.path.join(tmp_dir, 'transactions.csv')))
             self.assertTrue(os.path.exists(os.path.join(tmp_dir, 'summary.csv')))
 
+
+    def test_summary_includes_account_number_and_currency(self):
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.bai2', delete=False) as f:
+            f.write(_SAMPLE_BAI2)
+            tmp_path = f.name
+        try:
+            _, _, _, summaries = bai_parser.extract_bai_components(tmp_path)
+            self.assertTrue(len(summaries) > 0)
+            for s in summaries:
+                self.assertIn('Customer Account Number', s)
+                self.assertIn('Currency', s)
+                self.assertEqual(s['Customer Account Number'], '77777777')
+                self.assertEqual(s['Currency'], 'GBP')
+        finally:
+            os.unlink(tmp_path)
+
+    def test_transaction_amount_is_decimal_divided_by_100(self):
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.bai2', delete=False) as f:
+            f.write(_SAMPLE_BAI2)
+            tmp_path = f.name
+        try:
+            _, _, transactions, summaries = bai_parser.extract_bai_components(tmp_path)
+            # transaction amount 001 -> Decimal('0.01')
+            self.assertTrue(len(transactions) > 0)
+            self.assertEqual(transactions[0]['Amount'], Decimal('0.01'))
+            # summary amount 10000 -> Decimal('100.00')
+            self.assertTrue(len(summaries) > 0)
+            self.assertEqual(summaries[0]['Amount'], Decimal('100.00'))
+        finally:
+            os.unlink(tmp_path)
+
+    def test_parse_amount_handles_explicit_decimal(self):
+        from bai_file_processor.utils import parse_amount, format_amount
+        self.assertEqual(parse_amount('10000'), Decimal('10000'))
+        self.assertEqual(parse_amount('1000.50'), Decimal('1000.50'))
+        self.assertEqual(format_amount(10000), Decimal('100.00'))
+        self.assertIsNone(format_amount(None))
 
     def test_parse_type_code_158_ach_reversal_credit(self):
         bai2_with_158 = (
