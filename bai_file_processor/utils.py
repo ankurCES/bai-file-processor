@@ -1,7 +1,8 @@
 import datetime
 import re
+import warnings
 
-from .constants import TypeCodes
+from .constants import TypeCode, TypeCodeLevel, TypeCodes
 
 
 def parse_date(value):
@@ -53,20 +54,25 @@ def write_time(time, clock_format_for_intra_day=False):
 
 
 def write_clock_time(time):
-    date = datetime.datetime.now().replace(hour=time.hour, minute=time.minute, second=time.second)
-    return datetime.datetime.strftime(date, '%H:%M:%S')
+    return time.strftime('%H:%M:%S')
 
 
 def write_military_time(time):
     if time == datetime.time.max:
         return '2400'
-    else:
-        date = datetime.datetime.now().replace(hour=time.hour, minute=time.minute)
-        return datetime.datetime.strftime(date, '%H%M')
+    return time.strftime('%H%M')
 
 
 def parse_type_code(value):
-    return TypeCodes[value]
+    type_code = TypeCodes.get(value)
+    if type_code is None:
+        warnings.warn(
+            f'Unknown BAI2 type code {value!r} — treating as unclassified detail transaction.',
+            stacklevel=2,
+        )
+        type_code = TypeCode(code=value, transaction=None, level=TypeCodeLevel.detail,
+                             description=f'Unknown ({value})')
+    return type_code
 
 
 def convert_to_string(value):
@@ -105,7 +111,7 @@ def process_account_transactions(identifier, transactions):
             'Currency': identifier.currency,
             'BAI Code': transaction.type_code.code,
             'Transaction': transaction.type_code.transaction.value,
-            'Level': transaction.type_code.level.detail.value,
+            'Level': transaction.type_code.level.value,
             'Description': transaction.type_code.description,
             'Amount': transaction.amount,
             'Fund Type': transaction.funds_type,
@@ -156,15 +162,16 @@ def process_bai_grp_header(grp_header):
 
 def process_file_data(file_data):
     # Extract Header, Trailer, Transaction Data
-    bai_file_header = file_data.header
-    bai_file_trailer = file_data.trailer
-    header_dict = process_bai_header(bai_file_header)
-    # File Group
-    bai_file_group = file_data.children[0]
-    bai_file_grp_header = bai_file_group.header
-    bai_file_grp_trailer = bai_file_group.trailer
-    grp_header_dict = process_bai_grp_header(bai_file_grp_header)
-    # Acccounts
-    accounts = bai_file_group.children
-    list_transactions, summary_accounts = process_accounts(accounts)
+    header_dict = process_bai_header(file_data.header)
+    # Iterate all groups; grp_header_dict captures the first group only
+    # (return signature is preserved for backwards compatibility)
+    grp_header_dict = None
+    list_transactions = []
+    summary_accounts = []
+    for group in file_data.children:
+        if grp_header_dict is None:
+            grp_header_dict = process_bai_grp_header(group.header)
+        tr_list, summary_list = process_accounts(group.children)
+        list_transactions += tr_list
+        summary_accounts += summary_list
     return header_dict, grp_header_dict, list_transactions, summary_accounts

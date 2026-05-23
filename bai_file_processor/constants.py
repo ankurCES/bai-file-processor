@@ -133,6 +133,7 @@ TypeCodes = [
     TypeCode('150', TypeCodeTransaction.credit, TypeCodeLevel.summary, 'Total Preauthorized Payment Credits'),
     TypeCode('155', TypeCodeTransaction.credit, TypeCodeLevel.detail, 'Preauthorized Draft Credit'),
     TypeCode('156', TypeCodeTransaction.credit, TypeCodeLevel.detail, 'Item in PAC Deposit'),
+    TypeCode('158', TypeCodeTransaction.credit, TypeCodeLevel.detail, 'ACH Reversal Credit'),
     TypeCode('159', TypeCodeTransaction.credit, TypeCodeLevel.summary, 'Real Time Payment (RTP) Credit Total'),
     TypeCode('160', TypeCodeTransaction.credit, TypeCodeLevel.summary, 'Total ACH Disbursing Funding Credits'),
     TypeCode('162', TypeCodeTransaction.credit, TypeCodeLevel.summary, 'Corporate Trade Payment Settlement'),

@@ -1,5 +1,6 @@
 from .models import Record
 from .constants import RecordCode
+from .exceptions import ParsingException
 
 
 def _build_record(rows):
@@ -17,9 +18,16 @@ def _build_record(rows):
     return Record(code=rows[0][0], fields=fields, rows=rows)
 
 
+def _parse_row(line):
+    try:
+        return (RecordCode(line[:2]), line[3:])
+    except ValueError:
+        raise ParsingException(f'Unrecognised record code in line: {line!r}')
+
+
 def record_generator(lines):
     rows = iter(
-        [(RecordCode(line[:2]), line[3:]) for line in lines]
+        [_parse_row(line) for line in lines if line.strip()]
     )
 
     records = [next(rows)]

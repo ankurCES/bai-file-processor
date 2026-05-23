@@ -197,13 +197,13 @@ class Summary:
         amount=0,
         item_count=None,
         funds_type=None,
-        availability={}  # noqa: B006
+        availability=None
     ):
         self.type_code = type_code
         self.amount = amount
         self.item_count = item_count
         self.funds_type = funds_type
-        self.availability = availability
+        self.availability = availability if availability is not None else {}
 
 
 class AccountTrailer(Bai2SingleModel):
@@ -230,13 +230,14 @@ class TransactionDetail(Bai2SingleModel):
         type_code=None,
         amount=None,
         funds_type=None,
-        availability={},  # noqa: B006
+        availability=None,
         bank_reference=None,
         customer_reference=None,
         text=None
     ):
         super().__init__(
             rows, type_code=type_code, amount=amount, funds_type=funds_type,
-            availability=availability, bank_reference=bank_reference,
+            availability=availability if availability is not None else {},
+            bank_reference=bank_reference,
             customer_reference=customer_reference, text=text
         )

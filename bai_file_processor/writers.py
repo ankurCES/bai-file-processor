@@ -33,15 +33,20 @@ class BaseSectionWriter(BaseWriter):
     trailer_writer_class = None
 
     def write(self):
-        header = self.header_writer_class(self.obj.header).write()
+        kwargs = dict(
+            line_length=self.line_length,
+            text_on_new_line=self.text_on_new_line,
+            clock_format_for_intra_day=self.clock_format_for_intra_day,
+        )
+        header = self.header_writer_class(self.obj.header, **kwargs).write()
 
         children = []
         for child in self.obj.children:
-            children += self.child_writer_class(child).write()
+            children += self.child_writer_class(child, **kwargs).write()
 
         self.obj.update_totals()
         self.obj.trailer.number_of_records = len(header) + len(children) + 1
-        trailer = self.trailer_writer_class(self.obj.trailer).write()
+        trailer = self.trailer_writer_class(self.obj.trailer, **kwargs).write()
 
         return header + children + trailer
 
