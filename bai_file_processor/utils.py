@@ -1,6 +1,7 @@
 import datetime
 import re
 import warnings
+from decimal import Decimal
 
 from .constants import TypeCode, TypeCodeLevel, TypeCodes
 
@@ -75,6 +76,20 @@ def parse_type_code(value):
     return type_code
 
 
+def parse_amount(value):
+    """Parse a BAI2 amount string as Decimal, supporting both integer ('10000')
+    and explicit-decimal ('1000.50') formats sent by different banks."""
+    return Decimal(value)
+
+
+def format_amount(raw_amount):
+    """Convert a raw BAI2 amount (smallest currency unit, e.g. cents) to a
+    decimal dollar value by dividing by 100."""
+    if raw_amount is None:
+        return None
+    return Decimal(str(raw_amount)) / Decimal('100')
+
+
 def convert_to_string(value):
     if value is None:
         return ''
@@ -87,7 +102,7 @@ def process_account_summary(summary):
         'BAI Code': summary.type_code.code,
         'Level': summary.type_code.level.value,
         'Description': summary.type_code.description,
-        'Amount': summary.amount,
+        'Amount': format_amount(summary.amount),
         'Count': summary.item_count,
         'Fund Type': summary.funds_type,
         'Availability': summary.availability
@@ -96,9 +111,10 @@ def process_account_summary(summary):
 
 def process_account_header(header):
     summary_list = []
-    summary_items = header.summary_items
-    for account_summary in summary_items:
+    for account_summary in header.summary_items:
         summary_data = process_account_summary(account_summary)
+        summary_data['Customer Account Number'] = header.customer_account_number
+        summary_data['Currency'] = header.currency
         summary_list.append(summary_data)
     return summary_list
 
@@ -113,7 +129,7 @@ def process_account_transactions(identifier, transactions):
             'Transaction': transaction.type_code.transaction.value,
             'Level': transaction.type_code.level.value,
             'Description': transaction.type_code.description,
-            'Amount': transaction.amount,
+            'Amount': format_amount(transaction.amount),
             'Fund Type': transaction.funds_type,
             'Availability': transaction.availability,
             'Bank Reference': transaction.bank_reference,
