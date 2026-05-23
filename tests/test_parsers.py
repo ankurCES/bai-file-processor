@@ -1,18 +1,19 @@
 import datetime
 from collections import OrderedDict
+from decimal import Decimal
 from unittest import TestCase
 
-from bai2.constants import TypeCodes, FundsType, GroupStatus, \
+from bai_file_processor.constants import TypeCodes, FundsType, GroupStatus, \
     AsOfDateModifier
-from bai2.exceptions import ParsingException, \
+from bai_file_processor.exceptions import ParsingException, \
     NotSupportedYetException, IntegrityException
-from bai2.helpers import IteratorHelper
-from bai2.models import \
+from bai_file_processor.helpers import IteratorHelper
+from bai_file_processor.models import \
     Bai2File, Bai2FileHeader, Bai2FileTrailer, \
     Group, GroupHeader, GroupTrailer, \
     Account, AccountIdentifier, AccountTrailer, \
     TransactionDetail
-from bai2.parsers import TransactionDetailParser, AccountParser, \
+from bai_file_processor.parsers import TransactionDetailParser, AccountParser, \
     GroupParser, Bai2FileParser
 
 
@@ -28,7 +29,7 @@ class TransactionDetailParserTestCase(TestCase):
         transaction = parser.parse()
 
         self.assertEqual(transaction.type_code, TypeCodes['165'])
-        self.assertEqual(transaction.amount, 1500000)
+        self.assertEqual(transaction.amount, Decimal('1500000'))
         self.assertEqual(transaction.funds_type, FundsType.immediate_availability)
         self.assertEqual(transaction.bank_reference, 'DD1620')
         self.assertEqual(transaction.customer_reference, None)
@@ -49,7 +50,7 @@ class TransactionDetailParserTestCase(TestCase):
         transaction = parser.parse()
 
         self.assertEqual(transaction.type_code, TypeCodes['115'])
-        self.assertEqual(transaction.amount, 10000000)
+        self.assertEqual(transaction.amount, Decimal('10000000'))
         self.assertEqual(transaction.funds_type, FundsType.distributed_availability_simple)
         self.assertEqual(
             transaction.availability,
@@ -73,9 +74,9 @@ class TransactionDetailParserTestCase(TestCase):
         transaction = parser.parse()
 
         self.assertEqual(transaction.type_code, TypeCodes['165'])
-        self.assertEqual(transaction.amount, 1500000)
+        self.assertEqual(transaction.amount, Decimal('1500000'))
         self.assertEqual(transaction.funds_type, FundsType.unknown_availability)
-        self.assertEqual(transaction.availability, None)
+        self.assertEqual(transaction.availability, {})
         self.assertEqual(transaction.bank_reference, 'DD1620')
         self.assertEqual(transaction.customer_reference, None)
         self.assertEqual(
@@ -126,7 +127,7 @@ class TransactionDetailParserTestCase(TestCase):
         transaction = parser.parse()
 
         self.assertEqual(transaction.funds_type, FundsType.distributed_availability_simple)
-        self.assertEqual(transaction.amount, 5)
+        self.assertEqual(transaction.amount, Decimal('5'))
         self.assertEqual(
             transaction.availability,
             OrderedDict([('0', 1), ('1', 3), ('>1', 1)])
@@ -149,7 +150,7 @@ class TransactionDetailParserTestCase(TestCase):
         transaction = parser.parse()
 
         self.assertEqual(transaction.funds_type, FundsType.distributed_availability)
-        self.assertEqual(transaction.amount, 5)
+        self.assertEqual(transaction.amount, Decimal('5'))
 
         self.assertEqual(
             transaction.availability,
@@ -510,7 +511,7 @@ class Bai2FileParserTestCase(TestCase):
         transaction = account.children[0]
         self.assertTrue(isinstance(transaction, TransactionDetail))
         self.assertEqual(transaction.type_code, TypeCodes['191'])
-        self.assertEqual(transaction.amount, 1)
+        self.assertEqual(transaction.amount, Decimal('1'))
         self.assertEqual(transaction.funds_type, FundsType.value_dated)
         self.assertEqual(transaction.availability['date'], july_15_2015)
         self.assertEqual(transaction.availability['time'], None)

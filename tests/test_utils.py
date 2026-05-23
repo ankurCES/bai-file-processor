@@ -1,7 +1,7 @@
 import datetime
 from unittest import TestCase
 
-from bai2.utils import parse_date, parse_military_time, parse_time, write_time
+from bai_file_processor.utils import parse_date, parse_military_time, parse_time, write_time
 
 
 class ParseDateTestCase(TestCase):
